@@ -4,7 +4,7 @@ coursera = 1
 
 from mat import Mat
 from vec import Vec
-
+import matutil
 
 
 ## 1: (Problem 4.17.1) Computing matrix-vector products
@@ -151,7 +151,12 @@ def lin_comb_mat_vec_mult(M, v):
     True
     '''
     assert(M.D[1] == v.D)
-    pass
+    cols = matutil.mat2coldict(M)
+    result = Vec(M.D[0],{})
+    for j in M.D[1]:
+      result += v[j]*cols[j]
+    
+    return result
 
 
 
@@ -176,7 +181,12 @@ def lin_comb_vec_mat_mult(v, M):
       True
     '''
     assert(v.D == M.D[0])
-    pass
+    rows = matutil.mat2rowdict(M)
+    result = Vec(M.D[1],{})
+    for j in M.D[0]:
+      result += v[j]*rows[j]
+    
+    return result
 
 
 
@@ -199,7 +209,10 @@ def dot_product_mat_vec_mult(M, v):
     True
     '''
     assert(M.D[1] == v.D)
-    pass
+    rows = matutil.mat2rowdict(M)
+    result = Vec(M.D[0],{kr:vr*v for kr,vr in rows.items()})
+    
+    return result
 
 
 
@@ -221,7 +234,10 @@ def dot_product_vec_mat_mult(v, M):
       True
       '''
     assert(v.D == M.D[0])
-    pass
+    rows = matutil.mat2coldict(M)
+    result = Vec(M.D[1],{kr:vr*v for kr,vr in rows.items()})
+    
+    return result
 
 
 
