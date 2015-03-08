@@ -8,6 +8,8 @@ from bitutil import bits2mat, str2bits, noise
 from GF2 import one
 
 from matutil import listlist2mat
+from matutil import coldict2mat
+from matutil import mat2coldict
 
 ## Task 1
 """ Create an instance of Mat representing the generator matrix G. You can use
@@ -28,10 +30,10 @@ encoding_1001 = [i for i in (G * Vec({0,1,2,3},{0:one, 1:0, 2:0, 3:one})).f.valu
 
 ## Task 3
 # Express your answer as an instance of the Mat class.
-R = listlist2mat([[0, 0, 0, 0, 0, 0, one],
-                  [0, 0, 0, 0, 0, one, 0],
-                  [0, 0, 0, 0, one, 0, 0],
-                  [0, 0, one, 0, 0, 0, 0]])
+R = listlist2mat([[0, 0, 0,   0, 0,   0,   one],
+                  [0, 0, 0,   0, 0,   one, 0],
+                  [0, 0, 0,   0, one, 0,   0],
+                  [0, 0, one, 0, 0,   0,   0]])
 
 ## Task 4
 # Create an instance of Mat representing the check matrix H.
@@ -54,14 +56,15 @@ def find_error(syndrome):
         >>> find_error(Vec({0,1,2}, {})) == Vec({0,1,2,3,4,5,6}, {})
         True
     """
-    pass
+    e = {k:one for k in range(0,7) if H*Vec({0,1,2,3,4,5,6}, {k:one}) == syndrome}
+    return Vec({0,1,2,3,4,5,6},e)
 
 ## Task 6
 # Use the Vec class for your answers.
 non_codeword = Vec({0,1,2,3,4,5,6}, {0: one, 1:0, 2:one, 3:one, 4:0, 5:one, 6:one})
-error_vector = Vec(..., ...)
-code_word = Vec(..., ...)
-original = ... # R * code_word
+error_vector = find_error(H*non_codeword)
+code_word = non_codeword + error_vector
+original = R*code_word # R * code_word
 
 
 ## Task 7
@@ -74,20 +77,21 @@ def find_error_matrix(S):
         >>> find_error_matrix(S) == Mat(({0, 1, 2, 3, 4, 5, 6}, {0, 1, 2, 3}), {(1, 3): 0, (3, 0): 0, (2, 1): 0, (6, 2): 0, (5, 1): one, (0, 3): 0, (4, 0): 0, (1, 2): 0, (3, 3): 0, (6, 3): 0, (5, 0): 0, (2, 2): 0, (4, 1): 0, (1, 1): 0, (3, 2): one, (0, 0): 0, (6, 0): 0, (2, 3): 0, (4, 2): 0, (1, 0): 0, (5, 3): 0, (0, 1): 0, (6, 1): 0, (3, 1): 0, (2, 0): 0, (4, 3): one, (5, 2): 0, (0, 2): 0})
         True
     """
-    pass
+    #return coldict2mat([find_error(e) for e in mat2coldict(S).values()])
+    return coldict2mat({k:find_error(e) for k,e in mat2coldict(S).items()})
 
 ## Task 8
 s = "I'm trying to free your mind, Neo. But I can only show you the door. You're the one that has to walk through it."
-P = None
+P = bits2mat(str2bits(s))
 
 ## Task 9
-C = None
-bits_before = None
-bits_after = None
+C = G*P
+bits_before = len(P.D[0])*len(P.D[1])
+bits_after = len(C.D[0])*len(C.D[1])
 
 
 ## Ungraded Task
-CTILDE = None
+CTILDE = C + noise(C,.01)
 
 ## Task 10
 def correct(A):
@@ -99,5 +103,9 @@ def correct(A):
         >>> correct(A) == Mat(({0, 1, 2, 3, 4, 5, 6}, {1, 2, 3}), {(0, 1): 0, (1, 2): 0, (3, 2): 0, (1, 3): 0, (3, 3): 0, (5, 2): one, (6, 1): 0, (3, 1): 0, (2, 1): 0, (0, 2): one, (6, 3): one, (4, 2): 0, (6, 2): one, (2, 3): 0, (4, 3): 0, (2, 2): 0, (5, 1): 0, (0, 3): one, (4, 1): 0, (1, 1): 0, (5, 3): one})
         True
     """
-    pass
+    return A + find_error_matrix(H*A)
 
+##non_codeword = Vec({0,1,2,3,4,5,6}, {0: one, 1:0, 2:one, 3:one, 4:0, 5:one, 6:one})
+##error_vector = find_error(H*non_codeword)
+##code_word = non_codeword + error_vector
+##original = R*code_word # R * code_word

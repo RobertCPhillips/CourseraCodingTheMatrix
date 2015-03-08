@@ -93,10 +93,10 @@ w_coeff = 1
 ## 8: (Problem 5.14.8) 4 linearly dependent vectors, every 3 are independent
 # Please use the Vec class to represent your vectors
 
-indep_vec_1 = Vec({...}, {...})
-indep_vec_2 = Vec({...}, {...})
-indep_vec_3 = Vec({...}, {...})
-indep_vec_4 = Vec({...}, {...})
+indep_vec_1 = Vec({1,2,3,4}, {1:1, 2:0, 3:0, 4:0})
+indep_vec_2 = Vec({1,2,3,4}, {1:0, 2:1, 3:0, 4:0})
+indep_vec_3 = Vec({1,2,3,4}, {1:0, 2:0, 3:1, 4:0})
+indep_vec_4 = Vec({1,2,3,4}, {1:1, 2:1, 3:1, 4:0})
 
 
 
@@ -114,34 +114,34 @@ zero_comb_3 = [one,one,0,0,one]
 # In each subproblem, give your solution as a list of coefficients selected from {0, one}
 
 # [coeff of v1, coeff of v2, coeff of v3, coeff of v4, coeff of v5]
-sum_to_zero_1 = [...]
+sum_to_zero_1 = [0,one,0,one,one]
 
 # [coeff of v1, coeff of v2, coeff of v3, coeff of v4, coeff of v5, coeff of v7, coeff of v8]
-sum_to_zero_2 = [...]
+sum_to_zero_2 = [0,one,0,one,one,0,0]
 
 # [coeff of v1, coeff of v2, coeff of v3, coeff of v4, coeff of v6]
-sum_to_zero_3 = [...]
+sum_to_zero_3 = [one,0,one,one,one]
 
 # [coeff of v1, coeff of v2, coeff of v3, coeff of v5, coeff of v6, coeff of v7, coeff of v8]
-sum_to_zero_4 = [...]
+sum_to_zero_4 = [one,one,one,one,one,0,0]
 
 
 
 ## 11: (Problem 5.14.11) Exchange Lemma for Vectors over $\R$
 ## Please express your answer as a list of ints, such as [1,0,0,0,0]
 
-exchange_1 = [...]
-exchange_2 = [...]
-exchange_3 = [...]
+exchange_1 = [0,0,0,0,1]
+exchange_2 = [0,0,0,1,0]
+exchange_3 = [0,0,0,0,1]
 
 
 
 ## 12: (Problem 5.14.12) Exchange Lemma for Vectors over GF(2)
 # Please give the name of the vector you want to replace as a string (e.g. 'v1')
 
-replace_1 = ...
-replace_2 = ...
-replace_3 = ...
+replace_1 = 'v3'
+replace_2 = 'v1'
+replace_3 = 'v1'
 
 
 
@@ -163,8 +163,8 @@ def rep2vec(u, veclist):
         >>> rep2vec(Vec({0,1,2}, {0:2, 1:4}), [v0, v1, v2]) == Vec({'d', 'a', 'c', 'b'},{'a': 6, 'c': 0, 'b': 8, 'd': 0})
         True
     '''
-    pass
-
+    m1 = coldict2mat(veclist)
+    return m1*u
 
 
 ## 14: (Problem 5.14.14) vec2rep
@@ -183,7 +183,8 @@ def vec2rep(veclist, v):
         >>> vec2rep([v0,v1,v2], v)  == Vec({0, 1, 2},{0: 1.5, 1: -0.25, 2: 1.25})
         True
     '''
-    pass
+    m1 = coldict2mat(veclist)
+    return solve(m1,v)
 
 
 

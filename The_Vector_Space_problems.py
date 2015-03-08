@@ -3,7 +3,7 @@ coursera = 1
 # Please fill out this stencil and submit using the provided submission script.
 
 from vec import Vec
-
+from GF2 import one
 
 
 ## 1: (Problem 1) Vector Comprehension and Sum
@@ -75,7 +75,15 @@ def GF2_span(D, S):
     >>> S == {Vec({0, 1},{1: one}), Vec({0, 1},{0: one})}
     True
     '''
-    pass
+    if len(S) == 0:
+      return S
+    
+    result = set()
+    for s1 in S:
+      for s2 in S-{s1}:
+        result.update({x1*s1 + x2*s2 for x1 in [0,one] for x2 in [0,one]})
+    
+    return result
 
 
 
