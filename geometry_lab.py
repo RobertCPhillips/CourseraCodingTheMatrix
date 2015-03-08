@@ -142,22 +142,22 @@ def grayscale():
     Input: None
     Output: 3x3 greyscale matrix.
     '''
-    a = 77/256
-    b = 151/256
-    g = 28/256
+    r = 77/256
+    g = 151/256
+    b = 28/256
     
     m = identity({'r','g','b'})
-    m['r','r'] = a
-    m['g','r'] = a
-    m['b','r'] = a
-    
-    m['r','b'] = b
-    m['g','b'] = b
-    m['b','b'] = b
+    m['r','r'] = r
+    m['g','r'] = r
+    m['b','r'] = r
     
     m['r','g'] = g
     m['g','g'] = g
     m['b','g'] = g
+    
+    m['r','b'] = b
+    m['g','b'] = b
+    m['b','b'] = b
 
     return m
 
@@ -173,6 +173,8 @@ def reflect_about(x1, y1, x2, y2):
     >>> normsq(reflect_about(0,0,1,1) * Vec({'x','y','u'}, {'x':1, 'u':1}) - Vec({'x', 'u', 'y'},{'u': 1, 'y': 1})) < 1e-15
     True
     '''
-    pass
+    theta = math.atan((y2-y1)/(x2-x1))
+    
+    return translation(x1,y1)*rotation(theta)*reflect_x()*rotation(-theta)*translation(-x1,-y1)
 
 
