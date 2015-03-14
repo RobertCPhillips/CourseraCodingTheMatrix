@@ -226,8 +226,16 @@ def is_superfluous(S, v):
     False
     '''
     assert v in S
-    pass
-
+    if (v == Vec(v.D,{})):
+      return True
+    
+    if (len(S) == 1):
+      return False
+      
+    m = coldict2mat([v1 for v1 in S if v1 != v])
+    
+    result = solve(m,v)
+    return (v - m*result).is_almost_zero()
 
 
 ## 16: () is_independent in Python
@@ -257,8 +265,7 @@ def is_independent(S):
     >>> is_independent({list2vec(v) for v in [[one,one,0,0,0],[0,one,one,0,0],[0,0,one,one,0],[0,0,0,one,one]]})
     True
     '''
-    pass
-
+    return not any([is_superfluous(S,v) for v in S])
 
 
 ## 17: () Exchange Lemma in Python
