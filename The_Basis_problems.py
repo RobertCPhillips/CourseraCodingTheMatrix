@@ -296,5 +296,15 @@ def exchange(S, A, z):
         >>> exchange(S, A, z) in {list2vec(v) for v in [[one, one,0,0,0],[one,0,0,0,one],[0,0,0,one,one]]}
         True
     '''
-    pass
+    for w in S:
+      if not w in A: 
+        S2 = (S.union({z}) - {w})
+        
+        m = coldict2mat([v1 for v1 in S2])
+        result = solve(m,w)
+        
+        if (w - m*result).is_almost_zero():
+          return w
+          
+    return Vec(z.D,{})
 

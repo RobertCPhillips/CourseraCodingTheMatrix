@@ -5,11 +5,13 @@ coursera = 1
 from vecutil import list2vec
 from GF2 import one
 from solver import solve
-from matutil import listlist2mat, coldict2mat
+from matutil import listlist2mat, coldict2mat, mat2coldict, identity, mat2rowdict
 from mat import Mat
 from vec import Vec
+from triangular import triangular_solve
 
-
+from The_Basis_problems import exchange, is_superfluous
+from independence import rank, is_independent
 
 ## 1: (Problem 6.7.2) Iterative Exchange Lemma
 w0 = list2vec([1,0,0])
@@ -80,7 +82,16 @@ def morph(S, B):
         >>> sol == [(B[0],S[0]), (B[1],S[2]), (B[2],S[3])] or sol == [(B[0],S[1]), (B[1],S[2]), (B[2],S[3])]
         True
     '''
-    pass
+    Sk = {s for s in S}
+    A = set()
+    result = []
+    
+    for z in B:
+      w = exchange(Sk,A,z)
+      result = result + [(z,w)]      
+      A.update({w})
+      
+    return result
 
 
 
@@ -142,7 +153,12 @@ def subset_basis(T):
         >>> subset_basis({c0,c1,c2,c3,c4}) == {c0,c1,c2,c4}
         True
     '''
-    pass
+    S = {s for s in T}
+    for t in T:
+      if is_superfluous(S,t):
+        S = S - {t}
+    
+    return S
 
 
 
@@ -171,7 +187,13 @@ def superset_basis(C, T):
         >>> all(x in [a0,a1,a2,a3] for x in sb)
         True
     '''
-    pass
+    S = {s for s in C}
+    for t in T:
+      S.update({t})
+      if is_superfluous(S,t):
+        S = S - {t}
+    
+    return S
 
 
 
@@ -202,7 +224,7 @@ def my_is_independent(L):
         >>> L == [Vec(D,{0: 1}), Vec(D,{1: 1}), Vec(D,{2: 1}), Vec(D,{0: 1, 1: 1, 2: 1}), Vec(D,{0: 1, 1: 1}), Vec(D,{1: 1, 2: 1})]
         True
     '''
-    pass
+    return rank(L) == len(L)
 
 
 
@@ -222,7 +244,7 @@ def my_rank(L):
         >>> my_rank([list2vec(v) for v in [[1,1,1],[2,2,2],[3,3,3],[4,4,4],[123,432,123]]])
         2
     '''
-    pass
+    return len(subset_basis({s for s in L}))
 
 
 
@@ -264,8 +286,21 @@ def direct_sum_decompose(U_basis, V_basis, w):
         True
         >>> w == Vec(D,{0: 2, 1: 5, 2: 0, 3: 0, 4: 1, 5: 0})
         True
+        >>> ww = Vec({0, 1, 2, 3, 4, 5},{0: 2, 1: 5, 2: 51, 4: 1, 5: 7})
+        >>> (u, v) = direct_sum_decompose(U_basis, V_basis, ww)
+        >>> (u + v - ww).is_almost_zero()
+        True
     '''
-    pass
+    uvmat = coldict2mat(U_basis+V_basis)
+    uv = solve(uvmat,w)
+    
+    U_matrix = coldict2mat(U_basis)
+    V_matrix = coldict2mat(V_basis)
+    
+    u = U_matrix*Vec(U_matrix.D[1], {i:uv[i] for i in range(len(U_matrix.D[1]))})
+    v = V_matrix*Vec(V_matrix.D[1], {i:uv[i+len(U_matrix.D[1])] for i in range(len(V_matrix.D[1]))})
+    
+    return (u,v)
 
 
 
@@ -283,7 +318,7 @@ def is_invertible(M):
     >>> is_invertible(M1)
     False
     '''
-    pass
+    return is_independent([v for v in mat2coldict(M).values()]) and (len(M.D[0]) == len(M.D[1]))
 
 
 
@@ -302,7 +337,7 @@ def find_matrix_inverse(A):
         >>> find_matrix_inverse(M2) == Mat(M2.D, {(0, 1): one, (1, 0): one, (2, 2): one})
         True
     '''
-    pass
+    return coldict2mat([solve(A,i) for i in mat2coldict(identity(A.D[0],one)).values()])
 
 
 
@@ -321,5 +356,7 @@ def find_triangular_matrix_inverse(A):
         >>> find_triangular_matrix_inverse(A) == Mat(({0, 1, 2, 3}, {0, 1, 2, 3}), {(0, 1): -0.5, (1, 2): -0.3, (3, 2): 0.0, (0, 0): 1.0, (3, 3): 1.0, (3, 0): 0.0, (3, 1): 0.0, (2, 1): 0.0, (0, 2): -0.05000000000000002, (2, 0): 0.0, (1, 3): -0.87, (2, 3): -0.1, (2, 2): 1.0, (1, 0): 0.0, (0, 3): -3.545, (1, 1): 1.0})
         True
     '''
-    pass
+    aa = [a for a in mat2rowdict(A).values()]
+    dd = [d for d in A.D[0]]
+    return coldict2mat([triangular_solve(aa,dd,i) for i in mat2coldict(identity(A.D[0],1)).values()])
 
