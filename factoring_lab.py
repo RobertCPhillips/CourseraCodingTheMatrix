@@ -11,6 +11,8 @@ from factoring_support import gcd
 from factoring_support import primes
 from factoring_support import prod
 
+from vecutil import list2vec
+
 import echelon
 
 ## Task 1
@@ -29,7 +31,7 @@ def int2GF2(i):
         >>> int2GF2(100)
         0
     '''
-    pass
+    return one if i%2 == 1 else 0
 
 ## Task 2
 def make_Vec(primeset, factors):
@@ -45,7 +47,7 @@ def make_Vec(primeset, factors):
         >>> make_Vec({2,3,11}, [(2,3), (3,2)]) == Vec({2,3,11},{2:one})
         True
     '''
-    pass
+    return Vec(primeset, {k:int2GF2(v) for k,v in factors if int2GF2(v) == one})
 
 ## Task 3
 def find_candidates(N, primeset):
@@ -83,9 +85,19 @@ def find_candidates(N, primeset):
                 Vec(D,{2: one, 3: one, 13: one})])
         True
     '''
-    pass
-
-
+    roots = []
+    rowlist = []
+    target = len(primeset) + 1
+    x = intsqrt(N) + 1
+    
+    while (len(roots) < target and len(rowlist) < target):
+      x = x + 1
+      result = dumb_factor(x*x-N, primeset)
+      if (result != []):
+        roots.append(x)
+        rowlist.append(make_Vec(primeset,result))
+    
+    return (roots,rowlist)
 
 ## Task 4
 def find_a_and_b(v, roots, N):
@@ -108,8 +120,30 @@ def find_a_and_b(v, roots, N):
         >>> find_a_and_b(v, roots, N)
         (4081, 1170)
     '''
-    pass
+    alist = [roots[k] for k,v in v.f.items() if v == one]
+    a = prod(alist)
+    c = prod([x*x-N for x in alist])
+    b = intsqrt(c)
+    assert b*b == c
+    return (a,b)
 
+    
 ## Task 5
+def gcd(x,y): return x if y == 0 else gcd(y, x % y)
 
-nontrivial_divisor_of_2461799993978700679 = ... 
+def task5(N, p):
+  primelist = primes(p)
+  #N = 2461799993978700679
+  roots, rowlist = find_candidates(N, primelist)
+  M = echelon.transformation_rows(rowlist)
+  #print(M)
+  for r in reversed(range(len(M))):
+    v = M[r]
+    a,b = find_a_and_b(v, roots, N)
+    f = gcd(a-b,N)
+    if (f != 1 and f != N):
+      return f
+  
+  return -1
+  
+nontrivial_divisor_of_2461799993978700679 = 1230926561 
